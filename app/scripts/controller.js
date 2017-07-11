@@ -62,8 +62,8 @@ controller('FeedbackController', ['$scope', function($scope) {
         }
      }
   }]).
-  controller('DishDetailController', ['$scope', 'menuFactory',function($scope,menuFactory) {
-      $scope.dish= menuFactory.getDish(3);
+  controller('DishDetailController', ['$scope','$routeParams', 'menuFactory',function($scope,$routeParams,menuFactory) {
+      $scope.dish= menuFactory.getDish(parseInt($routeParams.id,10));
       $scope.postComment = function(){
         console.log($scope.comment);
         $scope.invalidChannelSelection = false;
