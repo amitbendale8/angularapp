@@ -3,7 +3,17 @@ angular.module('confusionApp').controller('MenuController',['$scope','menuFactor
   $scope.tab = 1;
   $scope.filtText = '';
   
-  $scope.dishes= menuFactory.getDishes();
+  $scope.dishes= [];
+  menuFactory.getDishes()
+  .then(
+      function(response) {
+          $scope.dishes = response.data;
+          $scope.showMenu = true;
+      },
+      function(response){
+         $scope.message = "Error: "+response.status + " " + response.statusText;
+      }
+  );
   
 
 
@@ -62,8 +72,20 @@ controller('FeedbackController', ['$scope', function($scope) {
         }
      }
   }]).
-  controller('DishDetailController', ['$scope','$routeParams', 'menuFactory',function($scope,$routeParams,menuFactory) {
-      $scope.dish= menuFactory.getDish(parseInt($routeParams.id,10));
+  controller('DishDetailController', ['$scope','$stateParams', 'menuFactory',function($scope,$stateParams,menuFactory) {
+      $scope.dish = {};
+      $scope.showDish = false;
+      $scope.message="Loading ...";
+      menuFactory.getDish(parseInt($stateParams.id,0))
+      .then(
+          function(response){
+              $scope.dish = response.data;
+              $scope.showDish=true;
+          },
+          function(response) {
+            $scope.message = "Error: "+response.status + " " + response.statusText;
+          }
+      );
       $scope.postComment = function(){
         console.log($scope.comment);
         $scope.invalidChannelSelection = false;
@@ -77,7 +99,34 @@ controller('FeedbackController', ['$scope', function($scope) {
 
         $scope.commentForm.$setPristine();
       }
+  }]).
+  controller('AboutController',['$scope','corporateFactory',function($scope,corporateFactory){
+    debugger;
+    console.log('aboutus');
+    var a =12;
+    $scope.leaders = corporateFactory.getLeaders();
+  }]).
+  controller('IndexController',['$scope','menuFactory','corporateFactory',function($scope,menuFactory,corporateFactory){
+    console.log('index');
+    $scope.dish = {};
+    $scope.showDish = false;
+    $scope.message="Loading ...";
+    menuFactory.getDish(0)
+    .then(
+        function(response){
+            $scope.dish = response.data;
+            $scope.showDish = true;
+        },
+        function(response) {
+            $scope.message = "Error: "+response.status + " " + response.statusText;
+        }
+    );
+    $scope.promotion = menuFactory.getPromotion();
+    $scope.leader = corporateFactory.getLeader(0);
+    console.log($scope.promotion);
+    
   }])
+  
 
 ;
 
