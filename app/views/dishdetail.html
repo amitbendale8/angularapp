@@ -42,7 +42,7 @@
             </li>
 
             <form class="form-horizontal" role="form"
-             name="commentForm" ng-submit="postComment()" novalidate>
+             name="commentForm" ng-submit="postComment()" ng-controller='DishCommentController' novalidate>
                 <div class="form-group" ng-class="{ 'has-error' : commentForm.comment.$error.required && !commentForm.comment.$pristine }">
                     <label for="comment" class="col-sm-2 control-label">Comment</label>
                     <div class="col-sm-10">
@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 <div class="form-group" ng-class="{ 'has-error' : commentForm.rating.$error.required && !commentForm.rating.$pristine }">
-                    <label for="rating" class="col-sm-2 control-label">Author</label>
+                    <label for="rating" class="col-sm-2 control-label">Rating</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" id="rating" name="rating" placeholder="Your Rating" ng-model="comment.rating" required>
                         <span ng-show="commentForm.rating.$error.required && !commentForm.rating.$pristine" class="help-block">Name</span>

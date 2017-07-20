@@ -2,18 +2,17 @@
 angular.module('confusionApp').controller('MenuController',['$scope','menuFactory', function($scope,menuFactory) {
   $scope.tab = 1;
   $scope.filtText = '';
+  $scope.showMenu = false;
+  $scope.message = "Loading ...";
+  $scope.dishes = menuFactory.getDishes().query(
+                function(response) {
+                    $scope.dishes = response;
+                    $scope.showMenu = true;
+                },
+                function(response) {
+                    $scope.message = "Error: "+response.status + " " + response.statusText;
+                });
   
-  $scope.dishes= [];
-  menuFactory.getDishes()
-  .then(
-      function(response) {
-          $scope.dishes = response.data;
-          $scope.showMenu = true;
-      },
-      function(response){
-         $scope.message = "Error: "+response.status + " " + response.statusText;
-      }
-  );
   
 
 
@@ -74,17 +73,18 @@ controller('FeedbackController', ['$scope', function($scope) {
   }]).
   controller('DishDetailController', ['$scope','$stateParams', 'menuFactory',function($scope,$stateParams,menuFactory) {
       $scope.dish = {};
+      
       $scope.showDish = false;
       $scope.message="Loading ...";
-      menuFactory.getDish(parseInt($stateParams.id,0))
-      .then(
-          function(response){
-              $scope.dish = response.data;
-              $scope.showDish=true;
-          },
-          function(response) {
-            $scope.message = "Error: "+response.status + " " + response.statusText;
-          }
+      $scope.dish = menuFactory.getDishes().get({id:parseInt($stateParams.id,10)})
+            .$promise.then(
+                function(response){
+                    $scope.dish = response;
+                    $scope.showDish = true;
+                },
+                function(response) {
+                    $scope.message = "Error: "+response.status + " " + response.statusText;
+                }
       );
       $scope.postComment = function(){
         console.log($scope.comment);
@@ -108,23 +108,35 @@ controller('FeedbackController', ['$scope', function($scope) {
   }]).
   controller('IndexController',['$scope','menuFactory','corporateFactory',function($scope,menuFactory,corporateFactory){
     console.log('index');
-    $scope.dish = {};
     $scope.showDish = false;
     $scope.message="Loading ...";
-    menuFactory.getDish(0)
-    .then(
+    $scope.dish = menuFactory.getDishes().get({id:0})
+    .$promise.then(
         function(response){
-            $scope.dish = response.data;
+            $scope.dish = response;
             $scope.showDish = true;
         },
         function(response) {
             $scope.message = "Error: "+response.status + " " + response.statusText;
         }
     );
+
     $scope.promotion = menuFactory.getPromotion();
     $scope.leader = corporateFactory.getLeader(0);
     console.log($scope.promotion);
     
+  }]).
+  controller('DishCommentController', ['$scope', 'menuFactory',function($scope,menuFactory) {
+      $scope.comment = {rating:5,comment:"",author:"",date:""};
+      $scope.postComment = function () {
+          $scope.comment.date = new Date().toISOString();
+          console.log($scope.comment);
+          $scope.dish.comments.push($scope.comment);
+
+          menuFactory.getDishes().update({id:$scope.dish.id},$scope.dish);
+                          $scope.commentForm.$setPristine();
+                          $scope.comment = {rating:5, comment:"", author:"", date:""};
+      }
   }])
   
 
